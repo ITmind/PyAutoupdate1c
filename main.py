@@ -4,10 +4,14 @@ from v8 import V83
 import os
 import sys
 import logging
+import time
 
 
 def main():
-    logSetup()
+    # serverName = 'c2-it-s-1c'
+    serverName = '192.168.0.11'
+    baseNames = ['buhcopy', 'buh','buhreg']
+
     logging.info('start PyAutoupdate1c')
     auth = {}
     passFile = os.path.abspath(os.path.join(
@@ -19,19 +23,16 @@ def main():
             key, val = line.split(':')
             auth[key] = val
 
-    baseNames = ['buhcopy', 'buh']
-
-    _1c = V83('c2-it-s-1c')
-    _1c.connectWorkingProcess()
-    _1c.authentication(auth)
+    _1c = V83(serverName, auth)
     for baseName in baseNames:
-
-        if _1c.checkModify(baseName, 'Кулик И.А.', auth['Кулик И.А.']):
+        if _1c.checkModify(baseName, 'Администратор'):
             logging.info(f'{baseName} modify')
-            _1c.enableSessionDenied(baseName)
-            _1c.restart1cService()
-            _1c.updateConfig(baseName, 'Кулик И.А.', auth['Кулик И.А.'])            
-            _1c.disableSessionDenied(baseName)
+            _1c = V83(serverName, auth)
+            if _1c.enableSessionDenied(baseName):
+                _1c.restart1cService()
+                _1c.updateConfig(baseName, 'Администратор')
+                time.sleep(20)
+                _1c.disableSessionDenied(baseName)
         else:
             logging.info(f'{baseName} not modify')
 
@@ -50,10 +51,12 @@ def logSetup():
 def runAsAdmin(func):
     if not pyuac.isUserAdmin():
         rc = pyuac.runAsAdmin()
+        logging.info('start as admin')
     else:
         try:
+            logging.info('admin privelegies')
             func()
-            input('ENTER')
+            # input('ENTER')
         except Exception as err:
             logging.error(f'{err}')
 
@@ -61,6 +64,8 @@ def runAsAdmin(func):
 
 
 if __name__ == "__main__":
+    logSetup()
+    logging.debug('start')
     # main()
     res = runAsAdmin(main)
     sys.exit(res)
