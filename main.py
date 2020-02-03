@@ -5,12 +5,14 @@ import os
 import sys
 import logging
 import time
-
+from smtplib import SMTP
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 def main():
     # serverName = 'c2-it-s-1c'
     serverName = '192.168.0.11'
-    baseNames = ['buhcopy', 'buh','buhreg']
+    baseNames = ['buhcopy', 'buh', 'buhreg']
 
     logging.info('start PyAutoupdate1c')
     auth = {}
@@ -37,11 +39,23 @@ def main():
             logging.info(f'{baseName} not modify')
 
     logging.info('end')
+    
+    message = logging.handlers[1]
+    msg = MIMEMultipart()
+    msg['From'] = "your_address"
+    msg['To'] = "to_address"
+    msg['Subject'] = "Photos"
+    msg.attach(MIMEText(message, 'plain'))
+
+    # with SMTP("smtp.gmail.com: 587") as smtp:
+    #     smtp.sendmail(msg['From'], msg['To'], msg.as_string())
+
 
 
 def logSetup():
     logFile = os.path.abspath(os.path.join(
         os.path.dirname(__file__), 'log.log'))
+    self.stream = StringIO()
     logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s',
                         handlers=[logging.FileHandler(
                             logFile, encoding='utf-8'), logging.StreamHandler()],
