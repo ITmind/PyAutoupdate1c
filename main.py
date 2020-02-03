@@ -1,6 +1,6 @@
 #!python3-32
 import pyuac
-from v8 import V83
+from V8py.v8 import V83
 import os
 import sys
 import logging
@@ -10,7 +10,7 @@ import time
 def main():
     # serverName = 'c2-it-s-1c'
     serverName = '192.168.0.11'
-    baseNames = ['buhcopy', 'buh','buhreg']
+    baseNames = ['buhcopy', 'buh', 'buhreg']
 
     logging.info('start PyAutoupdate1c')
     auth = {}
@@ -27,7 +27,6 @@ def main():
     for baseName in baseNames:
         if _1c.checkModify(baseName, 'Администратор'):
             logging.info(f'{baseName} modify')
-            _1c = V83(serverName, auth)
             if _1c.enableSessionDenied(baseName):
                 _1c.restart1cService()
                 _1c.updateConfig(baseName, 'Администратор')
