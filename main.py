@@ -2,10 +2,8 @@
 import pyuac
 from V8py.v8 import V83
 import os
-import sys
 import json
 import logging
-import time
 from io import StringIO
 from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
@@ -23,20 +21,25 @@ def main():
 
     logging.info('start PyAutoupdate1c')
 
-    _1c = V83(config['server'], config['1cpass'])
-    for baseName in config['bases']:
-        if _1c.checkModify(baseName, 'Администратор'):
-            logging.info(f'{baseName} modify')
-            if _1c.enableSessionDenied(baseName):
-                _1c.restart1cService()
-                _1c.updateConfig(baseName, 'Администратор')
-                time.sleep(20)
-                _1c.disableSessionDenied(baseName)
-        else:
-            logging.info(f'{baseName} not modify')
+    for base in config['bases']:
+        _1c = V83(base)
+        if _1c.checkModify():
+            updateDatabase(_1c, base['Ref'])
 
     logging.info('end')
+    # sendMail(config)
 
+
+def updateDatabase(_1c, baseName):
+    logging.info(f'{baseName} is modify')
+    if _1c.setSessionDenided(True):
+        # _1c.restart1cService()
+        if _1c.DisconectAllSessions():
+            _1c.updateConfig()
+        _1c.setSessionDenided(False)
+
+
+def sendMail(config):
     message = _stringStream.getvalue()
     msg = MIMEMultipart()
     msg['From'] = config['mail']['from']
@@ -110,6 +113,6 @@ def runAsAdmin(func):
 if __name__ == "__main__":
     logSetup()
     logging.debug('start')
-    # main()
-    res = runAsAdmin(main)
-    sys.exit(res)
+    main()
+    # res = runAsAdmin(main)
+    # sys.exit(res)

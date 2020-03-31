@@ -1,6 +1,8 @@
 {
-    "python.pythonPath": "C:\\Users\\Kulik_ia\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe",
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+  "python.pythonPath": "C:\\Users\\Kulik_ia\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe",
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true,
+  "npm.enableRunFromFolder": true,
+  "python.linting.flake8Args": ["--max-line-length 110"]
 }
