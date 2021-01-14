@@ -3,3 +3,5 @@ __pycache__
 __pycache__/pyuac.cpython-38.pyc
 log.log
 config.json
+.vscode
+.venv

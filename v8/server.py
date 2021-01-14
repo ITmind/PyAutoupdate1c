@@ -1,6 +1,4 @@
 import win32com.client
-import win32serviceutil
-import subprocess
 import logging
 import time
 
@@ -25,8 +23,7 @@ def attempts(numAttemps):
 
 class V83:
     __permissionCode = '123'
-    __1cpath = '"C:\\Program Files (x86)\\1cv8\\8.3.10.2580\\bin\\1cv8.exe"'
-
+    
     def __init__(self, base):
         self.Srvr = base['Srvr']
         self.Ref = base['Ref']
@@ -76,20 +73,7 @@ class V83:
                 ConnectToWorkProcess.AddAuthentication(self.Usr, self.Pwd)
                 self.__workingProceses.append(ConnectToWorkProcess)
 
-    def checkModify(self):
-        conStr = ';'.join(
-            [f'Srvr="{self.Srvr}"', f'Ref="{self.Ref}"',
-             f'Usr="{self.Usr}"', f'Pwd="{self.Pwd}"'])+';'
-        logging.debug(conStr)
-        result = False
-        try:
-            _v8 = self.__com.Connect(conStr)
-            result = _v8.ConfigurationChanged()
-        except Exception as err:
-            logging.error(f'{self.Ref}: {err.excepinfo[2]}')
-
-        return result
-
+    
     def setSessionDenided(self, value):
         self.connectWorkingProcess()
         time.sleep(1)  # без задержки частые обрывы
@@ -106,24 +90,3 @@ class V83:
                 workproc.UpdateInfoBase(base)
                 return True
         return False
-
-    def restart1cService(self):
-        logging.info('restart')
-        try:
-            win32serviceutil.RestartService(
-                'Агент сервера 1С:Предприятия 8.3 (x86-64)',
-                machine=self.Srvr)
-        except Exception as err:
-            logging.error(f'{err}')
-
-    def updateConfig(self):
-        logging.info("start update")
-        cmdstr = f'{self.__1cpath} CONFIG /UpdateDBCfg /S"{self.Srvr}/{self.Ref}" /N"{self.Usr}" /P"{self.Pwd}" /WA- /UC{self.__permissionCode}'
-        try:
-            output = subprocess.run(cmdstr, capture_output=True, check=True)
-            logging.debug(
-                "Вывод комманды обноления конфиуграции {output.stdout}")
-        except subprocess.CalledProcessError as err:
-            logging.error(err.stderr)
-
-        logging.info("update comlite")
